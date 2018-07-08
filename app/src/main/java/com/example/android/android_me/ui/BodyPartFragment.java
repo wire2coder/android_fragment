@@ -12,40 +12,72 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.android.android_me.R;
 import com.example.android.android_me.data.AndroidImageAssets;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BodyPartFragment extends Fragment {
 
     private static final String TAG = BodyPartFragment.class.getSimpleName();
 
-    private List<Integer> mImageIds;
+    private List<Integer> mImageIds; // list of either, heads, bodies, or legs
     private int mListIndex;
 
-    public BodyPartFragment() {
+    public static final String IMAGE_ID_LIST = "image_ids";
+    public static final String LIST_INDEX = "list_index";
 
+
+    // Fragment should have a default constructor with no arguments
+    public BodyPartFragment() {
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        if (savedInstanceState != null ) {
+            mImageIds = savedInstanceState.getIntegerArrayList(IMAGE_ID_LIST);
+            mListIndex = savedInstanceState.getInt(LIST_INDEX);
+        }
+
+
         // Inflate the fragment
         View rootView = inflater.inflate(R.layout.fragment_body_part, container, false);
 
         // Get a reference to the ImageView
-        ImageView imageView = (ImageView) rootView.findViewById(R.id.body_part_image_view);
+        final ImageView imageView = (ImageView) rootView.findViewById(R.id.body_part_image_view);
 
-        // Set the image resource to display
-//        imageView.setImageResource(AndroidImageAssets.getHeads(). get(1) );
 
         // mImageIds is not empty
         if ( mImageIds != null ) {
 
             imageView.setImageResource( mImageIds.get(mListIndex) );
+
+            // add a click listener to the ImageView
+            imageView.setOnClickListener( new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+
+                    if ( mListIndex < mImageIds.size()-1) {
+                        mListIndex++; // increment the index to show the next image
+                    } else {
+                        mListIndex = 0; // reset the index
+                    }
+
+                    // Set the image resource to display
+                    imageView.setImageResource( mImageIds.get(mListIndex) );
+
+                } // onClick()
+
+            } ); // new View.OnClickListener()
+
+
+
 
         } else {
 
@@ -67,6 +99,15 @@ public class BodyPartFragment extends Fragment {
 
     public void setListIndex( int ListIndex ) {
         this.mListIndex = ListIndex;
+    }
+
+
+    @Override
+    public void onSaveInstanceState(Bundle currentState) {
+//        super.onSaveInstanceState(currentState);
+
+        currentState.putIntegerArrayList(IMAGE_ID_LIST, (ArrayList<Integer>) mImageIds );
+        currentState.putInt(LIST_INDEX, mListIndex);
     }
 
 
